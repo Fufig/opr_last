@@ -8,28 +8,36 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // проверяем токен при загрузке
-  useEffect(() => {
-    if (!getToken()) {
+  // Function to fetch and set the current user
+  const fetchUser = async () => {
+    const token = getToken();
+    if (!token) {
+      setUser(null);
       setLoading(false);
       return;
     }
+    try {
+      const me = await apiFetch("/api/auth/me");
+      setUser(me);
+    } catch (error) {
+      clearToken();
+      setUser(null);
+      console.error("Failed to fetch user:", error); // Log error for debugging
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    apiFetch("/api/auth/me")
-      .then(setUser)
-      .catch(() => {
-        clearToken();
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  // Check token and fetch user on initial load
+  useEffect(() => {
+    fetchUser();
+  }, []); // Empty dependency array means this runs once on mount
 
   const login = async (login, password) => {
     try {
       const token = btoa(`${login}:${password}`);
       setToken(token);
-      const me = await apiFetch("/api/auth/me");
-      setUser(me);
+      await fetchUser(); // Fetch user after setting token
     } catch (error) {
       clearToken();
       setUser(null);
@@ -42,7 +50,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // Add a function to refresh the user data
+  const refreshUser = async () => {
+    await fetchUser();
+  };
+
   return (
-    <Ctx.Provider value={{ user, loading, login, logout }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ user, loading, login, logout, refreshUser }}>{children}</Ctx.Provider>
   );
 }

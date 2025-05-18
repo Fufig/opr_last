@@ -1,0 +1,68 @@
+/* src/components/Form.css */
+.form-container {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  max-width: 700px;
+  margin: 2rem auto;
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.styled-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Inputs, selects, textareas are globally styled in index.css but you can add specifics here */
+.styled-form input,
+.styled-form select,
+.styled-form textarea {
+  /* Ensure they inherit global styles or define component-specific ones */
+}
+
+.error-message { /* Already in index.css, but can be refined here */
+  padding: 0.75rem;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end; /* Align buttons to the right */
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+.form-actions button {
+  padding: 0.75em 1.5em;
+}

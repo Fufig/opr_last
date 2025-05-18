@@ -1,44 +1,38 @@
+// src/components/AddBook.jsx
 import { useState } from "react";
-import { apiFetch } from "../api";
+import { apiFetch } from "../api"; // Assuming api.js
 import { useNavigate } from "react-router-dom";
+import './Form.css'; // Common styles for forms
 
 const GENRES = [
   'fiction', 'non-fiction', 'science', 'fantasy', 'mystery',
   'romance', 'biography', 'history', 'poetry', 'children'
 ];
-
 const LANGUAGES = [
   'russian', 'english', 'german', 'french',
   'spanish', 'chinese', 'japanese'
 ];
-
 const CONDITIONS = ['new', 'good', 'worn'];
 const EXCHANGE_TYPES = ['temporary', 'permanent'];
 
 export default function AddBook() {
   const navigate = useNavigate();
-  const [err, setErr] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    description: "",
-    condition: "",
-    genre: "",
-    language: "",
-    pages: "",
-    exchange_type: ""
+    title: "", author: "", description: "", condition: "",
+    genre: "", language: "", pages: "", exchange_type: ""
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
       await apiFetch("/api/books", {
         method: "POST",
@@ -49,129 +43,78 @@ export default function AddBook() {
       });
       navigate("/my-books");
     } catch (e) {
-      setErr(e.message);
+      setError(e.message || "Failed to add book. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
+    <div className="form-container">
       <h2>Add New Book</h2>
-      {err && <p style={{ color: "red" }}>{err}</p>}
+      {error && <p className="error-message">{error}</p>}
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-        <div>
-          <label>Title:</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-          />
+      <form onSubmit={handleSubmit} className="styled-form">
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="title">Title:</label>
+            <input id="title" type="text" name="title" value={formData.title} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="author">Author:</label>
+            <input id="author" type="text" name="author" value={formData.author} onChange={handleChange} required />
+          </div>
         </div>
 
-        <div>
-          <label>Author:</label>
-          <input
-            type="text"
-            name="author"
-            value={formData.author}
-            onChange={handleChange}
-            required
-          />
+        <div className="form-group">
+          <label htmlFor="description">Description:</label>
+          <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={4} />
         </div>
 
-        <div>
-          <label>Description:</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-          />
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="condition">Condition:</label>
+            <select id="condition" name="condition" value={formData.condition} onChange={handleChange} required>
+              <option value="">Select Condition</option>
+              {CONDITIONS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="genre">Genre:</label>
+            <select id="genre" name="genre" value={formData.genre} onChange={handleChange} required>
+              <option value="">Select Genre</option>
+              {GENRES.map(g => <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>)}
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label>Condition:</label>
-          <select
-            name="condition"
-            value={formData.condition}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Condition</option>
-            {CONDITIONS.map(condition => (
-              <option key={condition} value={condition}>
-                {condition.charAt(0).toUpperCase() + condition.slice(1)}
-              </option>
-            ))}
-          </select>
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="language">Language:</label>
+            <select id="language" name="language" value={formData.language} onChange={handleChange} required>
+              <option value="">Select Language</option>
+              {LANGUAGES.map(l => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="pages">Pages:</label>
+            <input id="pages" type="number" name="pages" value={formData.pages} onChange={handleChange} min="0" />
+          </div>
         </div>
+        
+        <div className="form-group">
+            <label htmlFor="exchange_type">Exchange Type:</label>
+            <select id="exchange_type" name="exchange_type" value={formData.exchange_type} onChange={handleChange} required>
+              <option value="">Select Exchange Type</option>
+              {EXCHANGE_TYPES.map(type => <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>)}
+            </select>
+          </div>
 
-        <div>
-          <label>Genre:</label>
-          <select
-            name="genre"
-            value={formData.genre}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Genre</option>
-            {GENRES.map(genre => (
-              <option key={genre} value={genre}>
-                {genre.charAt(0).toUpperCase() + genre.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label>Language:</label>
-          <select
-            name="language"
-            value={formData.language}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Language</option>
-            {LANGUAGES.map(lang => (
-              <option key={lang} value={lang}>
-                {lang.charAt(0).toUpperCase() + lang.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label>Pages:</label>
-          <input
-            type="number"
-            name="pages"
-            value={formData.pages}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label>Exchange Type:</label>
-          <select
-            name="exchange_type"
-            value={formData.exchange_type}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Exchange Type</option>
-            {EXCHANGE_TYPES.map(type => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <button type="submit">Add Book</button>
-          <button type="button" onClick={() => navigate("/my-books")}>
+        <div className="form-actions">
+          <button type="submit" disabled={loading}>
+            {loading ? "Adding..." : "Add Book"}
+          </button>
+          <button type="button" className="secondary" onClick={() => navigate("/my-books")} disabled={loading}>
             Cancel
           </button>
         </div>

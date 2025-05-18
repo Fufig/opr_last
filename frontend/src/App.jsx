@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
-import { useAuth } from "./context/auth";
+// src/App.jsx
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, NavLink } from "react-router-dom";
+import { useAuth } from "./context/auth"; // Assuming auth.jsx
 import BookList from "./components/BookList";
 import MyBooks from "./components/MyBooks";
 import AddBook from "./components/AddBook";
@@ -8,85 +9,68 @@ import ExchangeManager from "./components/ExchangeManager";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
+import Protected from "./components/Protected"; // Assuming Protected.jsx is in routes
+import AdminUsers from "./components/AdminUsers"; // Assuming AdminUsers.jsx
+
+import "./App.css"; // Styles for App layout
 
 function App() {
   const { user, loading, logout } = useAuth();
 
   if (loading) {
-    return <div style={{ padding: 20 }}>Loading...</div>;
+    return <div className="loading-indicator">Loading application...</div>;
   }
 
   return (
     <Router>
-      <div>
-        <nav style={{
-          padding: 20,
-          display: "flex",
-          gap: 10,
-          backgroundColor: "#f8f9fa",
-          borderBottom: "1px solid #dee2e6",
-          marginBottom: 20,
-          alignItems: "center"
-        }}>
-          <Link to="/" style={{ textDecoration: "none", color: "#333" }}>Books</Link>
+      <div className="app-container">
+        <nav className="main-nav">
+          <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>Books</NavLink>
           {user ? (
             <>
-              <Link to="/my-books" style={{ textDecoration: "none", color: "#333" }}>My Books</Link>
-              <Link to="/exchanges" style={{ textDecoration: "none", color: "#333" }}>Exchanges</Link>
-              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px" }}>
+              <NavLink to="/my-books" className={({ isActive }) => isActive ? "active" : ""}>My Books</NavLink>
+              <NavLink to="/exchanges" className={({ isActive }) => isActive ? "active" : ""}>Exchanges</NavLink>
+              {user.role === 'admin' && (
+                 <NavLink to="/admin/users" className={({ isActive }) => isActive ? "active" : ""}>Admin Users</NavLink>
+              )}
+              <div className="nav-user-section">
                 <Profile />
                 <button
                   onClick={logout}
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: "#dc3545",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 4,
-                    cursor: "pointer"
-                  }}
+                  className="danger" // Using global style
                 >
                   Logout
                 </button>
               </div>
             </>
           ) : (
-            <>
-              <Link to="/login" style={{ textDecoration: "none", color: "#333" }}>Login</Link>
-              <Link to="/register" style={{ textDecoration: "none", color: "#333" }}>Register</Link>
-            </>
+            <div className="nav-user-section">
+              <NavLink to="/login" className={({ isActive }) => isActive ? "active" : ""}>Login</NavLink>
+              <NavLink to="/register" className={({ isActive }) => isActive ? "active" : ""}>Register</NavLink>
+            </div>
           )}
         </nav>
 
-        <div style={{ padding: "0 20px" }}>
+        <main className="main-content">
           <Routes>
             <Route path="/" element={<BookList />} />
-            <Route
-              path="/my-books"
-              element={user ? <MyBooks /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/add-book"
-              element={user ? <AddBook /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/edit-book/:bookId"
-              element={user ? <EditBook /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/exchanges"
-              element={user ? <ExchangeManager /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/login"
-              element={user ? <Navigate to="/" /> : <Login />}
-            />
-            <Route
-              path="/register"
-              element={user ? <Navigate to="/" /> : <Register />}
-            />
+            <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+            <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+
+            {/* Protected Routes */}
+            <Route path="/my-books" element={<Protected><MyBooks /></Protected>} />
+            <Route path="/add-book" element={<Protected><AddBook /></Protected>} />
+            <Route path="/edit-book/:bookId" element={<Protected><EditBook /></Protected>} />
+            <Route path="/exchanges" element={<Protected><ExchangeManager /></Protected>} />
+            
+            {/* Admin Protected Route */}
+            <Route path="/admin/users" element={<Protected adminOnly={true}><AdminUsers /></Protected>} />
+
+
+            {/* Add other routes here */}
+            <Route path="*" element={<Navigate to="/" />} /> {/* Fallback for unknown routes */}
           </Routes>
-        </div>
+        </main>
       </div>
     </Router>
   );

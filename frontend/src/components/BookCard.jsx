@@ -1,6 +1,8 @@
+// src/components/BookCard.jsx
 import { useState } from "react";
-import { useAuth } from "../context/auth";
+import { useAuth } from "../context/auth"; // Assuming auth.jsx
 import BookExchange from "./BookExchange";
+import './BookCard.css'; // We'll create this CSS file
 
 export default function BookCard({ book, onUpdate }) {
   const [showDescription, setShowDescription] = useState(false);
@@ -11,48 +13,38 @@ export default function BookCard({ book, onUpdate }) {
     book.status === "available";
 
   return (
-    <div style={{
-      border: "1px solid #ccc",
-      borderRadius: 8,
-      padding: 15,
-      display: "flex",
-      flexDirection: "column",
-      gap: 10,
-      backgroundColor: "white",
-      boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-    }}>
-      <h3 style={{ margin: 0 }}>{book.title}</h3>
-      <p style={{ margin: 0 }}><strong>Author:</strong> {book.author}</p>
-      <p style={{ margin: 0 }}><strong>Genre:</strong> {book.genre}</p>
-      <p style={{ margin: 0 }}><strong>Language:</strong> {book.language}</p>
-      <p style={{ margin: 0 }}><strong>Condition:</strong> {book.condition}</p>
-      <p style={{ margin: 0 }}><strong>Pages:</strong> {book.pages}</p>
-      <p style={{ margin: 0 }}><strong>Exchange Type:</strong> {book.exchange_type}</p>
-      <p style={{ margin: 0 }}><strong>Status:</strong> {book.status}</p>
-      <p style={{ margin: 0 }}><strong>Owner:</strong> {book.owner?.full_name || 'Unknown'}</p>
+    <div className="book-card">
+      <h3 className="book-card-title">{book.title}</h3>
+      <p className="book-card-detail"><strong>Author:</strong> {book.author}</p>
+      <p className="book-card-detail"><strong>Genre:</strong> {book.genre}</p>
+      <p className="book-card-detail"><strong>Language:</strong> {book.language}</p>
+      <p className="book-card-detail"><strong>Condition:</strong> {book.condition}</p>
+      <p className="book-card-detail"><strong>Pages:</strong> {book.pages || 'N/A'}</p>
+      <p className="book-card-detail"><strong>Exchange Type:</strong> {book.exchange_type}</p>
+      <p className="book-card-detail">
+        <strong>Status:</strong>
+        <span className={`status status-${book.status?.toLowerCase()}`}>{book.status}</span>
+      </p>
+      <p className="book-card-detail"><strong>Owner:</strong> {book.owner?.full_name || 'Unknown'}</p>
 
       {book.description && (
-        <>
+        <div className="book-card-description-section">
           <button
             onClick={() => setShowDescription(!showDescription)}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#f0f0f0",
-              border: "none",
-              borderRadius: 4,
-              cursor: "pointer"
-            }}
+            className="button-outline small"
           >
             {showDescription ? "Hide Description" : "Show Description"}
           </button>
           {showDescription && (
-            <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{book.description}</p>
+            <p className="book-card-description-text">{book.description}</p>
           )}
-        </>
+        </div>
       )}
 
       {canRequestExchange && (
-        <BookExchange bookId={book.id} onSuccess={onUpdate} />
+        <div className="book-card-exchange-section">
+          <BookExchange bookId={book.id} onSuccess={onUpdate} />
+        </div>
       )}
     </div>
   );
