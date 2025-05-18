@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydatabase
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # Монтируем код и папку migrations, чтобы миграции сохранялись на диске
+    volumes:
+      - ./backend:/app
+      - ./backend/migrations:/app/migrations
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    environment:
+      # Указываем, какой модуль запускать для flask CLI
+      FLASK_APP: wsgi.py
+      FLASK_ENV: development
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

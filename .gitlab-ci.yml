@@ -1,0 +1,76 @@
+# .gitlab-ci.yml
+stages:
+  - lint
+  - test
+  - build
+
+# Кеширование pip и npm-зависимостей
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .cache/pip/
+    - frontend/node_modules/
+
+########################
+# 1) Линтер для Python
+flake8:
+  image: python:3.9-slim
+  stage: lint
+  before_script:
+    - pip install --upgrade pip
+    - pip install flake8
+  script:
+    - flake8 backend/app
+  rules:
+    - changes:
+        - backend/app/**/*.py
+
+########################
+# 2) Тесты Backend
+backend_tests:
+  image: python:3.9-slim
+  stage: test
+  variables:
+    FLASK_ENV: testing
+  before_script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install pytest pytest-flask
+  script:
+    - pytest backend/tests --junitxml=backend/tests/junit.xml
+  artifacts:
+    when: always
+    reports:
+      junit: backend/tests/junit.xml
+
+########################
+# 3) Тесты Frontend
+frontend_tests:
+  image: node:16
+  stage: test
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm test
+  artifacts:
+    when: always
+    reports:
+      junit: frontend/junit.xml
+
+########################
+# 4) Сборка Docker-образов (если нужно)
+docker_build:
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA" -f backend/Dockerfile backend
+    - docker build -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" -f frontend/Dockerfile frontend
+    - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
+  only:
+    - master
