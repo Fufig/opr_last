@@ -1,0 +1,24 @@
+su postgres
+psql
+CREATE DATABASE bookdb;
+ALTER ROLE "blackcoder" WITH LOGIN;
+GRANT ALL PRIVILEGES ON DATABASE "bookdb" to blackcoder;
+ALTER USER blackcoder CREATEDB;
+\c bookdb
+GRANT ALL ON schema public TO blackcoder;
+exit
+
+
+
+
+flask db init
+flask db migrate
+flask db upgrade
+
+
+
+flask run
+
+
+npm install
+npm run dev
