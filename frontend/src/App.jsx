@@ -13,52 +13,62 @@ function App() {
   const { user, loading, logout } = useAuth();
 
   if (loading) {
-    return <div style={{ padding: 20 }}>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
   }
 
   return (
     <Router>
-      <div>
-        <nav style={{
-          padding: 20,
-          display: "flex",
-          gap: 10,
-          backgroundColor: "#f8f9fa",
-          borderBottom: "1px solid #dee2e6",
-          marginBottom: 20,
-          alignItems: "center"
-        }}>
-          <Link to="/" style={{ textDecoration: "none", color: "#333" }}>Books</Link>
-          {user ? (
-            <>
-              <Link to="/my-books" style={{ textDecoration: "none", color: "#333" }}>My Books</Link>
-              <Link to="/exchanges" style={{ textDecoration: "none", color: "#333" }}>Exchanges</Link>
-              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px" }}>
-                <Profile />
-                <button
-                  onClick={logout}
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: "#dc3545",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 4,
-                    cursor: "pointer"
-                  }}
-                >
-                  Logout
-                </button>
+      <div className="min-h-screen bg-gray-50">
+        <nav className="bg-white shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16 items-center">
+              <div className="flex space-x-8">
+                <Link to="/" className="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                  Books
+                </Link>
+                {user && (
+                  <>
+                    <Link to="/my-books" className="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                      My Books
+                    </Link>
+                    <Link to="/exchanges" className="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                      Exchanges
+                    </Link>
+                  </>
+                )}
               </div>
-            </>
-          ) : (
-            <>
-              <Link to="/login" style={{ textDecoration: "none", color: "#333" }}>Login</Link>
-              <Link to="/register" style={{ textDecoration: "none", color: "#333" }}>Register</Link>
-            </>
-          )}
+              
+              <div className="flex items-center space-x-4">
+                {user ? (
+                  <div className="flex items-center space-x-4">
+                    <Profile />
+                    <button
+                      onClick={logout}
+                      className="btn btn-danger"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex space-x-4">
+                    <Link to="/login" className="btn btn-primary">
+                      Login
+                    </Link>
+                    <Link to="/register" className="btn btn-secondary">
+                      Register
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </nav>
 
-        <div style={{ padding: "0 20px" }}>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
             <Route path="/" element={<BookList />} />
             <Route
@@ -86,7 +96,7 @@ function App() {
               element={user ? <Navigate to="/" /> : <Register />}
             />
           </Routes>
-        </div>
+        </main>
       </div>
     </Router>
   );

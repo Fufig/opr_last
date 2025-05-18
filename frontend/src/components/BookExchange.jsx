@@ -3,78 +3,65 @@ import { useAuth } from "../context/auth";
 import { apiFetch } from "../api";
 
 export default function BookExchange({ bookId, onSuccess }) {
-    const [notes, setNotes] = useState("");
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const { user } = useAuth();
+  const [notes, setNotes] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!notes.trim()) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!notes.trim()) return;
 
-        setLoading(true);
-        setError(null);
+    setLoading(true);
+    setError(null);
 
-        try {
-            await apiFetch("/api/exchanges", {
-                method: "POST",
-                body: JSON.stringify({
-                    book_id: bookId,
-                    notes: notes
-                })
-            });
+    try {
+      await apiFetch("/api/exchanges", {
+        method: "POST",
+        body: JSON.stringify({
+          book_id: bookId,
+          notes: notes
+        })
+      });
 
-            setNotes("");
-            if (onSuccess) onSuccess();
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (!user) {
-        return (
-            <div style={{ marginTop: "10px" }}>
-                <p>Please log in to request an exchange</p>
-            </div>
-        );
+      setNotes("");
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  if (!user) {
     return (
-        <div style={{ marginTop: "10px" }}>
-            <form onSubmit={handleSubmit}>
-                <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Add a note to your exchange request..."
-                    style={{
-                        width: "100%",
-                        minHeight: "80px",
-                        padding: "8px",
-                        marginBottom: "10px",
-                        borderRadius: "4px",
-                        border: "1px solid #ddd"
-                    }}
-                />
-                {error && (
-                    <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>
-                )}
-                <button
-                    type="submit"
-                    disabled={loading || !notes.trim()}
-                    style={{
-                        padding: "8px 16px",
-                        backgroundColor: loading ? "#ccc" : "#4CAF50",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: loading ? "not-allowed" : "pointer"
-                    }}
-                >
-                    {loading ? "Requesting..." : "Request Exchange"}
-                </button>
-            </form>
-        </div>
+      <div className="text-center py-4">
+        <p className="text-gray-500">Please log in to request an exchange</p>
+      </div>
     );
-} 
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Add a note to your exchange request..."
+        className="input min-h-[100px]"
+      />
+      {error && (
+        <p className="text-sm text-red-600">{error}</p>
+      )}
+      <button
+        type="submit"
+        disabled={loading || !notes.trim()}
+        className={clsx(
+          "btn btn-primary w-full",
+          loading && "opacity-50 cursor-not-allowed"
+        )}
+      >
+        {loading ? "Requesting..." : "Request Exchange"}
+      </button>
+    </form>
+  );
+}

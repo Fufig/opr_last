@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { apiFetch } from "../api";
 import { useNavigate } from "react-router-dom";
+import clsx from "clsx";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -39,97 +40,97 @@ export default function Register() {
   };
 
   return (
-    <div style={{ padding: 20, maxWidth: 400, margin: "0 auto" }}>
-      <h2>Register</h2>
-      {err && <p style={{ color: "red" }}>{err}</p>}
-
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 15 }}>
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <div className="card max-w-md w-full space-y-8">
         <div>
-          <label>Login:</label>
-          <input
-            type="text"
-            name="login"
-            value={formData.login}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: 4,
-              border: "1px solid #ccc"
-            }}
-          />
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            Create your account
+          </h2>
         </div>
 
-        <div>
-          <label>Full Name:</label>
-          <input
-            type="text"
-            name="full_name"
-            value={formData.full_name}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: 4,
-              border: "1px solid #ccc"
-            }}
-          />
-        </div>
+        {err && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+            {err}
+          </div>
+        )}
 
-        <div>
-          <label>Telegram:</label>
-          <input
-            type="text"
-            name="telegram"
-            value={formData.telegram}
-            onChange={handleChange}
-            required
-            placeholder="@username"
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: 4,
-              border: "1px solid #ccc"
-            }}
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="login" className="block text-sm font-medium text-gray-700">
+                Login
+              </label>
+              <input
+                id="login"
+                type="text"
+                name="login"
+                value={formData.login}
+                onChange={handleChange}
+                required
+                className="input mt-1"
+              />
+            </div>
 
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            minLength={6}
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: 4,
-              border: "1px solid #ccc"
-            }}
-          />
-        </div>
+            <div>
+              <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                id="full_name"
+                type="text"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
+                required
+                className="input mt-1"
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: "10px",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: 4,
-            cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.7 : 1
-          }}
-        >
-          {loading ? "Registering..." : "Register"}
-        </button>
-      </form>
+            <div>
+              <label htmlFor="telegram" className="block text-sm font-medium text-gray-700">
+                Telegram
+              </label>
+              <input
+                id="telegram"
+                type="text"
+                name="telegram"
+                value={formData.telegram}
+                onChange={handleChange}
+                required
+                placeholder="@username"
+                className="input mt-1"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+                className="input mt-1"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={clsx(
+              "btn btn-primary w-full",
+              loading && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            {loading ? "Creating account..." : "Create account"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
